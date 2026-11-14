@@ -1,0 +1,28 @@
+name: Crypto signals
+
+on:
+  schedule:
+    - cron: "5 * * * *"   # каждый час в :05 (время UTC), когда часовая свеча уже закрыта
+  workflow_dispatch:       # кнопка «Run workflow» — пришлёт отчёт сразу
+
+jobs:
+  signals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Check signals
+        run: python bot.py
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # ручной запуск = прислать отчёт даже без сигналов (проверка, что всё работает)
+          FORCE_REPORT: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
