@@ -27,6 +27,12 @@ jobs:
         env:
           DAYS: ${{ inputs.days }}
 
+      - name: Print packed data to log
+        run: |
+          echo "=====DATA-BEGIN====="
+          tar czf - data | base64 -w 120
+          echo "=====DATA-END====="
+
       - uses: actions/upload-artifact@v6
         with:
           name: history
